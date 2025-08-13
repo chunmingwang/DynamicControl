@@ -1,4 +1,8 @@
-﻿'#Region "Form"
+﻿'frmDynamicControl
+' Copyright (c) 2025 CM.Wang
+' Freeware. Use at your own risk.
+
+'#Region "Form"
 	#if defined(__FB_MAIN__) AndAlso Not defined(__MAIN_FILE__)
 		#define __MAIN_FILE__
 		#ifdef __FB_WIN32__
@@ -7,17 +11,17 @@
 		Const _MAIN_FILE_ = __FILE__
 	#endif
 	#include once "mff/Form.bi"
-	#include once "mff/CommandButton.bi"
-	#include once "mff/ComboBoxEdit.bi"
 	#include once "mff/CheckBox.bi"
 	#include once "mff/CheckedListBox.bi"
+	#include once "mff/ComboBoxEdit.bi"
+	#include once "mff/CommandButton.bi"
 	#include once "mff/ImageBox.bi"
 	#include once "mff/Label.bi"
 	#include once "mff/ListControl.bi"
+	#include once "mff/Picture.bi"
 	#include once "mff/ProgressBar.bi"
 	#include once "mff/RadioButton.bi"
 	#include once "mff/TextBox.bi"
-	#include once "mff/Picture.bi"
 	#include once "mff/TrackBar.bi"
 	
 	Using My.Sys.Forms
@@ -26,14 +30,17 @@
 		lstCtl As List
 		LstFrm As List
 		
+		Declare Sub DeleteControl(ByRef Sender As Control Ptr)
 		Declare Sub CommandButton1_Click(ByRef Sender As Control)
 		Declare Sub Form_MouseMove(ByRef Sender As Control, MouseButton As Integer, x As Integer, y As Integer, Shift As Integer)
+		Declare Sub CheckBox2_Click(ByRef Sender As CheckBox)
+		Declare Sub Form_Destroy(ByRef Sender As Control)
 		Declare Constructor
 		
 		Dim As CommandButton CommandButton1, CommandButton2, CommandButton3, CommandButton4
 		Dim As ComboBoxEdit ComboBoxEdit1
-		Dim As CheckBox CheckBox1
-		Dim As Label Label1
+		Dim As CheckBox CheckBox1, CheckBox2
+		Dim As Label Label1, Label2
 	End Type
 	
 	Constructor Form3Type
@@ -44,7 +51,8 @@
 			.Designer = @This
 			.Caption = "Dynamic Control Example"
 			.OnMouseMove = Cast(Sub(ByRef Designer As My.Sys.Object, ByRef Sender As Control, MouseButton As Integer, x As Integer, y As Integer, Shift As Integer), @Form_MouseMove)
-			.SetBounds 0, 0, 650, 380
+			.OnDestroy = Cast(Sub(ByRef Designer As My.Sys.Object, ByRef Sender As Control), @Form_Destroy)
+			.SetBounds 0, 0, 650, 400
 		End With
 		' ComboBoxEdit1
 		With ComboBoxEdit1
@@ -54,16 +62,16 @@
 			.SetBounds 10, 10, 140, 21
 			.Designer = @This
 			.Parent = @This
-			.AddItem("CommandButton")
-			.AddItem("ComboBoxEdit")
 			.AddItem("CheckBox")
 			.AddItem("CheckedListBox")
+			.AddItem("ComboBoxEdit")
+			.AddItem("CommandButton")
 			.AddItem("ImageBox")
 			.AddItem("ListControl")
+			.AddItem("Picture")
 			.AddItem("ProgressBar")
 			.AddItem("RadioButton")
 			.AddItem("TextBox")
-			.AddItem("Picture")
 			.AddItem("TrackBar")
 			'more controls...
 			.ItemIndex = 0
@@ -83,9 +91,9 @@
 		With CommandButton1
 			.Name = "CommandButton1"
 			.Text = "Add control"
-			.TabIndex = 1
+			.TabIndex = 2
 			.Caption = "Add control"
-			.SetBounds 10, 80, 140, 20
+			.SetBounds 10, 70, 140, 20
 			.Designer = @This
 			.OnClick = Cast(Sub(ByRef Designer As My.Sys.Object, ByRef Sender As Control), @CommandButton1_Click)
 			.Parent = @This
@@ -94,9 +102,9 @@
 		With CommandButton2
 			.Name = "CommandButton2"
 			.Text = "Delete control"
-			.TabIndex = 2
+			.TabIndex = 3
 			.Caption = "Delete control"
-			.SetBounds 10, 110, 140, 20
+			.SetBounds 10, 100, 140, 20
 			.Designer = @This
 			.OnClick = Cast(Sub(ByRef Designer As My.Sys.Object, ByRef Sender As Control), @CommandButton1_Click)
 			.Parent = @This
@@ -105,9 +113,9 @@
 		With Label1
 			.Name = "Label1"
 			.Text = "Control count: 0"
-			.TabIndex = 3
+			.TabIndex = 4
 			.Caption = "Control count: 0"
-			.SetBounds 10, 140, 140, 20
+			.SetBounds 10, 130, 140, 20
 			.Designer = @This
 			.Parent = @This
 		End With
@@ -115,7 +123,7 @@
 		With CommandButton3
 			.Name = "CommandButton3"
 			.Text = "Create form"
-			.TabIndex = 4
+			.TabIndex = 5
 			.Caption = "Create form"
 			.SetBounds 10, 280, 140, 20
 			.Designer = @This
@@ -126,11 +134,33 @@
 		With CommandButton4
 			.Name = "CommandButton4"
 			.Text = "Destroy form"
-			.TabIndex = 5
+			.TabIndex = 6
 			.Caption = "Destroy form"
 			.SetBounds 10, 310, 140, 20
 			.Designer = @This
 			.OnClick = Cast(Sub(ByRef Designer As My.Sys.Object, ByRef Sender As Control), @CommandButton1_Click)
+			.Parent = @This
+		End With
+		' CheckBox2
+		With CheckBox2
+			.Name = "CheckBox2"
+			.Text = "Darkmode"
+			.TabIndex = 7
+			.Caption = "Darkmode"
+			.Checked = True
+			.SetBounds 10, 250, 140, 20
+			.Designer = @This
+			.OnClick = Cast(Sub(ByRef Designer As My.Sys.Object, ByRef Sender As CheckBox), @CheckBox2_Click)
+			.Parent = @This
+		End With
+		' Label2
+		With Label2
+			.Name = "Label2"
+			.Text = "Form count: 0"
+			.TabIndex = 8
+			.Caption = "Form count: 0"
+			.SetBounds 10, 340, 140, 20
+			.Designer = @This
 			.Parent = @This
 		End With
 	End Constructor
@@ -187,8 +217,9 @@ Private Sub Form3Type.CommandButton1_Click(ByRef Sender As Control)
 		lstCtl.Add a
 		i = lstCtl.Count - 1
 		
-		a->Name = s & "_" & i
-		a->Text = Cast(Control Ptr, a)->Name
+		
+		a->Name = s
+		a->Text = s & "_" & i
 		a->OnClick = Cast(Sub(ByRef Designer As My.Sys.Object, ByRef Sender As Control), @CommandButton1_Click)
 		a->OnMouseMove = Cast(Sub(ByRef Designer As My.Sys.Object, ByRef Sender As Control, MouseButton As Integer, x As Integer, y As Integer, Shift As Integer), @Form_MouseMove)
 		a->Hint = a->Name
@@ -198,10 +229,9 @@ Private Sub Form3Type.CommandButton1_Click(ByRef Sender As Control)
 		
 		a->Move x * 140 + (x + 1) * 10, y * 20 + (y + 1) * 10, 140, 20
 		a->Visible = True
-		Label1.Caption = "Control count: " & i + 1
-		Debug.Print "Control add: " & i & ", x=" & x & ", y=" & y
+		Label1.Caption = "Control count: " & lstCtl.Count
 		
-		If CheckBox1.Checked = False Then Exit Sub 
+		If CheckBox1.Checked = False Then Exit Sub
 		i = ComboBoxEdit1.ItemIndex
 		i += 1
 		If i > ComboBoxEdit1.ItemCount - 1 Then i = 0
@@ -212,40 +242,83 @@ Private Sub Form3Type.CommandButton1_Click(ByRef Sender As Control)
 		i -= 1
 		
 		Dim a As Control Ptr = lstCtl.Item(i)
+		lstCtl.Remove(i)
 		a->Visible= False
-
 		This.Remove a
-		Delete a
-		lstCtl.Remove i
-		Label1.Caption = "Control count: " & i
+		DeleteControl(a)
+		Label1.Caption = "Control count: " & lstCtl.Count
 	Case "CommandButton3" 'Create form
 		Dim a As Form3Type Ptr
 		a = New Form3Type
 		LstFrm.Add a
 		i = LstFrm.Count
-		Debug.Print "Form add: " & i
-
+		
 		a->Name = "Form" & i
 		a->Caption = a->Name
 		a->Show(This)
-		a->Visible = True 
+		a->Visible = True
+		Label2.Caption = "Form count: " & LstFrm.Count
 	Case "CommandButton4" 'Destroy form
 		i = LstFrm.Count
 		If i < 1 Then Exit Sub
 		
-		Debug.Print "Form remove: " & i
 		Dim a As Form3Type Ptr = LstFrm.Item(i - 1)
+		LstFrm.Remove i - 1
 		a->CloseForm
 		Delete a
-		LstFrm.Remove i - 1
+		Label2.Caption = "Form count: " & LstFrm.Count
 	Case Else
 		MsgBox "(" & Sender.Name & ") was clicked."
 	End Select
 End Sub
 
 Private Sub Form3Type.Form_MouseMove(ByRef Sender As Control, MouseButton As Integer, x As Integer, y As Integer, Shift As Integer)
-	Debug.Print "MouseButton: " & MouseButton
 	If MouseButton <> 0 Then Exit Sub
 	ReleaseCapture()
 	SendMessage(Sender.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0)
+End Sub
+
+Private Sub Form3Type.CheckBox2_Click(ByRef Sender As CheckBox)
+	App.DarkMode = Sender.Checked
+	InvalidateRect(0, NULL, False)
+End Sub
+
+Private Sub Form3Type.DeleteControl(ByRef Sender As Control Ptr)
+	Select Case Sender->Name
+	Case "CommandButton"
+		Delete Cast(CommandButton Ptr, Sender)
+	Case "ComboBoxEdit"
+		Delete Cast(ComboBoxEdit Ptr, Sender)
+	Case "CheckBox"
+		Delete Cast(CheckBox Ptr, Sender)
+	Case "CheckedListBox"
+		Delete Cast(CheckedListBox Ptr, Sender)
+	Case "ImageBox"
+		Delete Cast(ImageBox Ptr, Sender)
+	Case "ListControl"
+		Delete Cast(ListControl Ptr, Sender)
+	Case "ProgressBar"
+		Delete Cast(ProgressBar Ptr, Sender)
+	Case "RadioButton"
+		Delete Cast(RadioButton Ptr, Sender)
+	Case "TextBox"
+		Delete Cast(TextBox Ptr, Sender)
+	Case "Picture"
+		Delete Cast(Picture Ptr, Sender)
+	Case "TrackBar"
+		Delete Cast(TrackBar Ptr, Sender)
+	Case Else
+		'more controls...
+	End Select
+End Sub
+
+Private Sub Form3Type.Form_Destroy(ByRef Sender As Control)
+	While lstCtl.Count
+		DeleteControl(lstCtl.Item(0))
+		lstCtl.Remove(0)
+	Wend
+	While LstFrm.Count
+		Delete Cast(Form3Type Ptr, LstFrm.Item(0))
+		LstFrm.Remove(0)
+	Wend
 End Sub
